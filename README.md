@@ -1,10 +1,10 @@
 # PINKBindView
 
-[![CI Status](http://img.shields.io/travis/Pinka/PINKBindView.svg?style=flat)](https://travis-ci.org/Pinka/PINKBindView)
 [![Version](https://img.shields.io/cocoapods/v/PINKBindView.svg?style=flat)](http://cocoadocs.org/docsets/PINKBindView)
 [![License](https://img.shields.io/cocoapods/l/PINKBindView.svg?style=flat)](http://cocoadocs.org/docsets/PINKBindView)
 [![Platform](https://img.shields.io/cocoapods/p/PINKBindView.svg?style=flat)](http://cocoadocs.org/docsets/PINKBindView)
-==============
+
+
 PINKBindView provide a simple way to use tableView and collectionView.
 
 ## Usage
