@@ -62,6 +62,9 @@ typedef NS_OPTIONS(NSInteger, PINKBindTableView_Delegate_MethodType) {
 @property (nonatomic, strong) UITableViewCell<PINKBindCellProtocol> *cacheCell;
 @property (nonatomic, strong) RACDisposable *dataSourceDisposer;
 
+@property (nonatomic, strong) RACDisposable *dataSourceDeallocDisposer;
+@property (nonatomic, strong) RACDisposable *delegateDeallocDisposer;
+
 @end
 
 @implementation PINKBindTableView
@@ -109,49 +112,53 @@ typedef NS_OPTIONS(NSInteger, PINKBindTableView_Delegate_MethodType) {
 #pragma mark - Overwrite DataSource
 - (void)setDataSource:(id<UITableViewDataSource>)dataSource
 {
-    if (_dataSourceInterceptor) {
-        _dataSourceInterceptor.receiver = dataSource;
-        //UITableViewDataSource有类似缓存机制优化，所以先设置nil
-        [super setDataSource:nil];
-        [super setDataSource:(id<UITableViewDataSource>)_dataSourceInterceptor];
-        
-        [self updateDataSourceMethodType];
-    } else {
-        [super setDataSource:dataSource];
+    [[(NSObject *)_dataSourceInterceptor.receiver rac_deallocDisposable] removeDisposable:self.dataSourceDeallocDisposer];
+    _dataSourceInterceptor.receiver = dataSource;
+    //UITableViewDataSource有类似缓存机制优化，所以先设置nil
+    [super setDataSource:nil];
+    [super setDataSource:(id<UITableViewDataSource>)_dataSourceInterceptor];
+    
+    [self updateDataSourceMethodType];
+    
+    if (dataSource) {
+        @weakify(self);
+        self.dataSourceDeallocDisposer = [RACDisposable disposableWithBlock:^{
+            @strongify(self);
+            self.dataSource = nil;
+        }];
+        [[(NSObject *)dataSource rac_deallocDisposable] addDisposable:self.dataSourceDeallocDisposer];
     }
 }
 
 - (id<UITableViewDataSource>)realDataSource
 {
-    if (_dataSourceInterceptor) {
-        return _dataSourceInterceptor.receiver;
-    } else {
-        return [super dataSource];
-    }
+    return _dataSourceInterceptor.receiver;
 }
 
 #pragma mark - Overwrite Delegate
 - (void)setDelegate:(id<UITableViewDelegate>)delegate
 {
-    if (_delegateInterceptor) {
-        _delegateInterceptor.receiver = delegate;
-        
-        [super setDelegate:nil];
-        [super setDelegate:(id<UITableViewDelegate>)_delegateInterceptor];
-        
-        [self updateDelegateMethodType];
-    } else {
-        [super setDelegate:delegate];
+    [[(NSObject *)_delegateInterceptor.receiver rac_deallocDisposable] removeDisposable:self.delegateDeallocDisposer];
+    _delegateInterceptor.receiver = delegate;
+    
+    [super setDelegate:nil];
+    [super setDelegate:(id<UITableViewDelegate>)_delegateInterceptor];
+    
+    [self updateDelegateMethodType];
+    
+    if (delegate) {
+        @weakify(self);
+        self.delegateDeallocDisposer = [RACDisposable disposableWithBlock:^{
+            @strongify(self);
+            self.delegate = nil;
+        }];
+        [[(NSObject *)delegate rac_deallocDisposable] addDisposable:self.delegateDeallocDisposer];
     }
 }
 
 - (id<UITableViewDelegate>)realDelegate
 {
-    if (_delegateInterceptor) {
-        return _delegateInterceptor.receiver;
-    } else {
-        return [super delegate];
-    }
+    return _delegateInterceptor.receiver;
 }
 
 #pragma mark - UITableViewDataSource

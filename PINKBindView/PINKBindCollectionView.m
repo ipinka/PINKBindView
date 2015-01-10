@@ -56,6 +56,9 @@ typedef NS_OPTIONS(NSInteger, PINKBindCollectionView_DataSource_MethodType) {
 @property (nonatomic, strong) UICollectionViewCell<PINKBindCellProtocol> *cacheCell;
 @property (nonatomic, strong) RACDisposable *dataSourceDisposer;
 
+@property (nonatomic, strong) RACDisposable *dataSourceDeallocDisposer;
+@property (nonatomic, strong) RACDisposable *delegateDeallocDisposer;
+
 @end
 
 @implementation PINKBindCollectionView
@@ -104,47 +107,51 @@ typedef NS_OPTIONS(NSInteger, PINKBindCollectionView_DataSource_MethodType) {
 #pragma mark - Overwrite DataSource
 - (void)setDataSource:(id<UICollectionViewDataSource>)dataSource
 {
-    if (_dataSourceInterceptor) {
-        _dataSourceInterceptor.receiver = dataSource;
-        //UICollectionViewDataSource有类似缓存机制优化，所以先设置nil
-        [super setDataSource:nil];
-        [super setDataSource:(id<UICollectionViewDataSource>)_dataSourceInterceptor];
-        
-        [self updateDataSourceMethodType];
-    } else {
-        [super setDataSource:dataSource];
+    [[(NSObject *)_dataSourceInterceptor.receiver rac_deallocDisposable] removeDisposable:self.dataSourceDeallocDisposer];
+    _dataSourceInterceptor.receiver = dataSource;
+    //UICollectionViewDataSource有类似缓存机制优化，所以先设置nil
+    [super setDataSource:nil];
+    [super setDataSource:(id<UICollectionViewDataSource>)_dataSourceInterceptor];
+    
+    [self updateDataSourceMethodType];
+    
+    if (dataSource) {
+        @weakify(self);
+        self.dataSourceDeallocDisposer = [RACDisposable disposableWithBlock:^{
+            @strongify(self);
+            self.dataSource = nil;
+        }];
+        [[(NSObject *)dataSource rac_deallocDisposable] addDisposable:self.dataSourceDeallocDisposer];
     }
 }
 
 - (id<UICollectionViewDataSource>)realDataSource
 {
-    if (_dataSourceInterceptor) {
-        return _dataSourceInterceptor.receiver;
-    } else {
-        return [super dataSource];
-    }
+    return _dataSourceInterceptor.receiver;
 }
 
 #pragma mark - Overwrite Delegate
 - (void)setDelegate:(id<UICollectionViewDelegate>)delegate
 {
-    if (_delegateInterceptor) {
-        _delegateInterceptor.receiver = delegate;
-        
-        [super setDelegate:nil];
-        [super setDelegate:(id<UICollectionViewDelegate>)_delegateInterceptor];
-    } else {
-        [super setDelegate:delegate];
+    [[(NSObject *)_delegateInterceptor.receiver rac_deallocDisposable] removeDisposable:self.delegateDeallocDisposer];
+    _delegateInterceptor.receiver = delegate;
+    
+    [super setDelegate:nil];
+    [super setDelegate:(id<UICollectionViewDelegate>)_delegateInterceptor];
+    
+    if (delegate) {
+        @weakify(self);
+        self.delegateDeallocDisposer = [RACDisposable disposableWithBlock:^{
+            @strongify(self);
+            self.delegate = nil;
+        }];
+        [[(NSObject *)delegate rac_deallocDisposable] addDisposable:self.delegateDeallocDisposer];
     }
 }
 
 - (id<UICollectionViewDelegate>)realDelegate
 {
-    if (_delegateInterceptor) {
-        return _delegateInterceptor.receiver;
-    } else {
-        return [super delegate];
-    }
+    return _delegateInterceptor.receiver;
 }
 
 #pragma mark - 缓存DataSource方法
