@@ -354,6 +354,7 @@ typedef NS_OPTIONS(NSInteger, PINKBindTableView_Delegate_MethodType) {
         } else if (_createCellBlock) {
             _cacheCell = (UITableViewCell<PINKBindCellProtocol> *)_createCellBlock([NSIndexPath indexPathForRow:0 inSection:0]);
         }
+        [self reloadData];
     } else {
         _cacheCell = nil;
     }
