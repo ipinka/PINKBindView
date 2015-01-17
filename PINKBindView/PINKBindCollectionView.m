@@ -85,6 +85,12 @@ typedef NS_OPTIONS(NSInteger, PINKBindCollectionView_DataSource_MethodType) {
     return self;
 }
 
+- (void)dealloc
+{
+    [[(NSObject *)_dataSourceInterceptor.receiver rac_deallocDisposable] removeDisposable:self.dataSourceDeallocDisposer];
+    [[(NSObject *)_delegateInterceptor.receiver rac_deallocDisposable] removeDisposable:self.delegateDeallocDisposer];
+}
+
 #pragma mark - Private Initialize
 - (void)_PINKBindCollectionView_customInit
 {

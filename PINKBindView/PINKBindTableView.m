@@ -91,6 +91,12 @@ typedef NS_OPTIONS(NSInteger, PINKBindTableView_Delegate_MethodType) {
     return self;
 }
 
+- (void)dealloc
+{
+    [[(NSObject *)_dataSourceInterceptor.receiver rac_deallocDisposable] removeDisposable:self.dataSourceDeallocDisposer];
+    [[(NSObject *)_delegateInterceptor.receiver rac_deallocDisposable] removeDisposable:self.delegateDeallocDisposer];
+}
+
 #pragma mark - Private Initialize
 - (void)_PINKBindTableView_customInit
 {
