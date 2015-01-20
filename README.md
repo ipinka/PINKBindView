@@ -10,9 +10,14 @@ PINKBindView provide a simple way to use tableView and collectionView.
 ## Usage
 
 Such as
-		[self.tableView setDataSourceSignal:RACObserve(self, list)
-              				 selectionCommand:self.selectionCommand
-                    						cellNib:CustomTableViewCell.viewNib];
+
+	[self.tableView setDataSourceSignal:RACObserve(self, list)
+              		   selectionCommand:self.selectionCommand
+                    	 		cellNib:CustomTableViewCell.viewNib];
+
+And you should implementation this method in your cell class:
+
+	- (void)bindCellViewModel:(id)viewModel indexPath:(NSIndexPath *)indexPath
                     						
 
 
