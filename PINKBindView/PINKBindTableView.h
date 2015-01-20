@@ -47,6 +47,10 @@ typedef UITableViewCell *(^PINKBindTableViewCreateCellBlock)(NSIndexPath *indexP
 
 - (void)setDataSourceSignal:(RACSignal *)sourceSignal
            selectionCommand:(RACCommand *)selection
+                    cellNib:(UINib *)cellNib;
+
+- (void)setDataSourceSignal:(RACSignal *)sourceSignal
+           selectionCommand:(RACCommand *)selection
             createCellBlock:(PINKBindTableViewCreateCellBlock)createCellBlock;
 
 @end

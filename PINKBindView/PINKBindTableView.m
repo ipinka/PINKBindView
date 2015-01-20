@@ -56,6 +56,7 @@ typedef NS_OPTIONS(NSInteger, PINKBindTableView_Delegate_MethodType) {
 @property (nonatomic, strong) NSArray *tableData;
 @property (nonatomic, strong) RACCommand *didSelectedCommand;
 @property (nonatomic, unsafe_unretained) Class<PINKBindCellProtocol> cellClass;
+@property (nonatomic, strong) UINib *cellNib;
 @property (nonatomic, strong) NSString *cellReuseIdentifier;
 @property (nonatomic, copy) PINKBindTableViewCreateCellBlock createCellBlock;
 
@@ -192,17 +193,19 @@ typedef NS_OPTIONS(NSInteger, PINKBindTableView_Delegate_MethodType) {
         _dataSourceMethodType & PINKBindTableView_DataSource_MethodType_cellForRowAtIndexPath) {
         return [_dataSourceInterceptor.receiver tableView:tableView cellForRowAtIndexPath:indexPath];
     } else {
-        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:_cellReuseIdentifier];
-        if (!cell) {
-            if (_cellClass) {
-                cell = [[(Class)_cellClass alloc] init];
-            } else if (_createCellBlock) {
+        UITableViewCell *cell = nil;
+        if (_createCellBlock) {
+            cell = [tableView dequeueReusableCellWithIdentifier:_cellReuseIdentifier];
+            if (!cell) {
                 cell = _createCellBlock(indexPath);
             }
-            CGRect realFrame = cell.frame;
-            realFrame.size.width = self.frame.size.width;
-            cell.frame = realFrame;
+        } else {
+            cell = [tableView dequeueReusableCellWithIdentifier:_cellReuseIdentifier forIndexPath:indexPath];
         }
+        
+        CGRect realFrame = cell.frame;
+        realFrame.size.width = self.frame.size.width;
+        cell.frame = realFrame;
         [(id<PINKBindCellProtocol>)cell bindCellViewModel:_tableData[indexPath.section][indexPath.row]
                                                 indexPath:indexPath];
         
@@ -280,19 +283,23 @@ typedef NS_OPTIONS(NSInteger, PINKBindTableView_Delegate_MethodType) {
                   cellClass:(Class<PINKBindCellProtocol>)cellClass
 {
     self.cellClass = cellClass;
+    self.cellNib = nil;
     self.createCellBlock = nil;
     self.didSelectedCommand = selection;
     [self configCellReuseIdentifierAndCellHeight];
-    
-    @weakify(self);
-    [self.dataSourceDisposer dispose];
-    self.dataSourceDisposer =
-    [[sourceSignal takeUntil:self.rac_willDeallocSignal]
-     subscribeNext:^(NSArray *source) {
-        @strongify(self);
-        self.tableData = source;
-        [self reloadData];
-    }];
+    [self _PINKBindTableView_configDataSource:sourceSignal];
+}
+
+- (void)setDataSourceSignal:(RACSignal *)sourceSignal
+           selectionCommand:(RACCommand *)selection
+                    cellNib:(UINib *)cellNib
+{
+    self.cellClass = nil;
+    self.cellNib = cellNib;
+    self.createCellBlock = nil;
+    self.didSelectedCommand = selection;
+    [self configCellReuseIdentifierAndCellHeight];
+    [self _PINKBindTableView_configDataSource:sourceSignal];
 }
 
 - (void)setDataSourceSignal:(RACSignal *)sourceSignal
@@ -300,19 +307,11 @@ typedef NS_OPTIONS(NSInteger, PINKBindTableView_Delegate_MethodType) {
             createCellBlock:(PINKBindTableViewCreateCellBlock)createCellBlock
 {
     self.cellClass = nil;
+    self.cellNib = nil;
     self.createCellBlock = createCellBlock;
     self.didSelectedCommand = selection;
     [self configCellReuseIdentifierAndCellHeight];
-    
-    @weakify(self);
-    [self.dataSourceDisposer dispose];
-    self.dataSourceDisposer =
-    [[sourceSignal takeUntil:self.rac_willDeallocSignal]
-     subscribeNext:^(NSArray *source) {
-        @strongify(self);
-        self.tableData = source;
-        [self reloadData];
-    }];
+    [self _PINKBindTableView_configDataSource:sourceSignal];
 }
 
 - (void)configCellReuseIdentifierAndCellHeight
@@ -320,10 +319,16 @@ typedef NS_OPTIONS(NSInteger, PINKBindTableView_Delegate_MethodType) {
     UITableViewCell *oneCell = nil;
     if (_cellClass) {
         oneCell = [[(Class)_cellClass alloc] init];
+        _cellReuseIdentifier = oneCell.reuseIdentifier;
+        [self registerClass:_cellClass forCellReuseIdentifier:_cellReuseIdentifier];
+    } else if (_cellNib) {
+        oneCell = [_cellNib instantiateWithOwner:nil options:nil][0];
+        _cellReuseIdentifier = oneCell.reuseIdentifier;
+        [self registerNib:_cellNib forCellReuseIdentifier:_cellReuseIdentifier];
     } else if (_createCellBlock) {
         oneCell = _createCellBlock([NSIndexPath indexPathForRow:0 inSection:0]);
+        _cellReuseIdentifier = oneCell.reuseIdentifier;
     }
-    _cellReuseIdentifier = oneCell.reuseIdentifier;
     self.rowHeight = oneCell.frame.size.height;
     
     if (_autoCellHeight &&
@@ -351,6 +356,8 @@ typedef NS_OPTIONS(NSInteger, PINKBindTableView_Delegate_MethodType) {
     if (_autoCellHeight) {
         if (_cellClass) {
             _cacheCell = [[(Class)_cellClass alloc] init];
+        } else if (_cellNib) {
+            _cacheCell = [_cellNib instantiateWithOwner:nil options:nil][0];
         } else if (_createCellBlock) {
             _cacheCell = (UITableViewCell<PINKBindCellProtocol> *)_createCellBlock([NSIndexPath indexPathForRow:0 inSection:0]);
         }
@@ -358,6 +365,19 @@ typedef NS_OPTIONS(NSInteger, PINKBindTableView_Delegate_MethodType) {
     } else {
         _cacheCell = nil;
     }
+}
+
+- (void)_PINKBindTableView_configDataSource:(RACSignal *)sourceSignal
+{
+    @weakify(self);
+    [self.dataSourceDisposer dispose];
+    self.dataSourceDisposer =
+    [[sourceSignal takeUntil:self.rac_willDeallocSignal]
+     subscribeNext:^(NSArray *source) {
+         @strongify(self);
+         self.tableData = source;
+         [self reloadData];
+     }];
 }
 
 @end
