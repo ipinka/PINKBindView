@@ -9,7 +9,12 @@ PINKBindView provide a simple way to use tableView and collectionView.
 
 ## Usage
 
-To run the example project, clone the repo, and run `pod install` from the Example directory first.
+Such as
+		[self.tableView setDataSourceSignal:RACObserve(self, list)
+              				 selectionCommand:self.selectionCommand
+                    						cellNib:CustomTableViewCell.viewNib];
+                    						
+
 
 ## Requirements
 
