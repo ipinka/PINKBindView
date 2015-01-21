@@ -200,7 +200,7 @@ typedef NS_OPTIONS(NSInteger, PINKBindTableView_Delegate_MethodType) {
                 cell = _createCellBlock(indexPath);
             }
         } else {
-            cell = [tableView dequeueReusableCellWithIdentifier:_cellReuseIdentifier forIndexPath:indexPath];
+            cell = [tableView dequeueReusableCellWithIdentifier:_cellReuseIdentifier];
         }
         
         CGRect realFrame = cell.frame;
