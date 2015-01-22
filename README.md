@@ -19,7 +19,7 @@ And you should implementation this method in your cell class:
 ```objc
 - (void)bindCellViewModel:(id)viewModel indexPath:(NSIndexPath *)indexPath
 ```            						
-
+You also can run the example project, clone the repo, and run `pod install` from the Example directory first.
 
 ## Requirements
 
