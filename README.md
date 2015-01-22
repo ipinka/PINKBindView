@@ -5,7 +5,7 @@
 [![Platform](https://img.shields.io/cocoapods/p/PINKBindView.svg?style=flat)](http://cocoadocs.org/docsets/PINKBindView)
 
 
-PINKBindView provide a simple way to use tableView and collectionView.
+PINKBindView provide a simple way to use tableView and collectionView, inspired by [Raywenderlich](http://www.raywenderlich.com/74106/mvvm-tutorial-with-reactivecocoa-part-1)
 
 ## Usage
 
