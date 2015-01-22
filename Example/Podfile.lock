@@ -1,0 +1,19 @@
+PODS:
+  - PINKBindView (1.0.3):
+    - ReactiveCocoa (~> 2.3.1)
+  - ReactiveCocoa (2.3.1):
+    - ReactiveCocoa/UI (= 2.3.1)
+  - ReactiveCocoa/Core (2.3.1):
+    - ReactiveCocoa/no-arc
+  - ReactiveCocoa/no-arc (2.3.1)
+  - ReactiveCocoa/UI (2.3.1):
+    - ReactiveCocoa/Core
+
+DEPENDENCIES:
+  - PINKBindView (~> 1.0)
+
+SPEC CHECKSUMS:
+  PINKBindView: 4b006ae634e147854404a3c2935f1caf5cbcdd37
+  ReactiveCocoa: dca75777b9d18990c8714a3a6f2149f29b4d1462
+
+COCOAPODS: 0.35.0
