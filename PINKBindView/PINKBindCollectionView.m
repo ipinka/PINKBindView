@@ -205,7 +205,8 @@ typedef NS_OPTIONS(NSInteger, PINKBindCollectionView_DataSource_MethodType) {
     } else {
         UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:_cellReuseIdentifier forIndexPath:indexPath];
         [(id<PINKBindCellProtocol>)cell bindCellViewModel:_collectionData[indexPath.section][indexPath.row]
-                                                indexPath:indexPath];
+                                                indexPath:indexPath
+                                              displayFlag:YES];
         
         return cell;
     }

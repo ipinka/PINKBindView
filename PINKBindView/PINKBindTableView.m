@@ -207,7 +207,8 @@ typedef NS_OPTIONS(NSInteger, PINKBindTableView_Delegate_MethodType) {
         realFrame.size.width = self.frame.size.width;
         cell.frame = realFrame;
         [(id<PINKBindCellProtocol>)cell bindCellViewModel:_tableData[indexPath.section][indexPath.row]
-                                                indexPath:indexPath];
+                                                indexPath:indexPath
+                                              displayFlag:YES];
         
         return cell;
     }
@@ -237,7 +238,8 @@ typedef NS_OPTIONS(NSInteger, PINKBindTableView_Delegate_MethodType) {
         _cacheCell.frame = newCellFrame;
         
         [_cacheCell bindCellViewModel:_tableData[indexPath.section][indexPath.row]
-                            indexPath:indexPath];
+                            indexPath:indexPath
+                          displayFlag:NO];
         return [_cacheCell cellHeight];
     }
     

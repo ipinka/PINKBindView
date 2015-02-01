@@ -28,7 +28,7 @@
 
 @protocol PINKBindCellProtocol <NSObject>
 
-- (void)bindCellViewModel:(id)viewModel indexPath:(NSIndexPath *)indexPath;
+- (void)bindCellViewModel:(id)viewModel indexPath:(NSIndexPath *)indexPath displayFlag:(BOOL)displayFlag;
 
 @optional
 - (CGFloat)cellHeight;
