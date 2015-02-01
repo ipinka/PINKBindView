@@ -18,11 +18,13 @@
 
 @implementation ExampleTableViewCell
 
-- (void)bindCellViewModel:(id)viewModel indexPath:(NSIndexPath *)indexPath
+- (void)bindCellViewModel:(id)viewModel indexPath:(NSIndexPath *)indexPath displayFlag:(BOOL)displayFlag
 {
     NSDictionary *dict = viewModel;
     
-    self.titleLabel.text = dict[@"title"];
+    if (displayFlag) {
+        self.titleLabel.text = dict[@"title"];
+    }
     self.contentLabel.text = dict[@"content"];
 }
 
