@@ -19,5 +19,5 @@ Pod::Spec.new do |s|
 
   s.source_files = 'PINKBindView'
 
-  s.dependency 'ReactiveCocoa', '~> 2.3.1'
+  s.dependency 'ReactiveCocoa', '~> 2.3'
 end
