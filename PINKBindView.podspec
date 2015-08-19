@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "PINKBindView"
-  s.version          = "2.0.1"
+  s.version          = "2.0.2"
   s.summary          = "PINKBindView provide a simple way to use tableView and collectionView."
   s.description      = <<-DESC
                        PINKBindView provide a simple way to use tableView and collectionView.
