@@ -245,7 +245,8 @@ typedef NS_OPTIONS(NSInteger, PINKBindCollectionView_DataSource_MethodType) {
      subscribeNext:^(NSArray *source) {
          @strongify(self);
          self.collectionData = source;
-         [self reloadData];
+         if (self.isAutoReload)
+             [self reloadData];
      }];
 }
 
@@ -265,7 +266,8 @@ typedef NS_OPTIONS(NSInteger, PINKBindCollectionView_DataSource_MethodType) {
      subscribeNext:^(NSArray *source) {
          @strongify(self);
          self.collectionData = source;
-         [self reloadData];
+         if (self.isAutoReload)
+             [self reloadData];
      }];
 }
 

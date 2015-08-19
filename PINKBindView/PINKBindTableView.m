@@ -378,7 +378,8 @@ typedef NS_OPTIONS(NSInteger, PINKBindTableView_Delegate_MethodType) {
      subscribeNext:^(NSArray *source) {
          @strongify(self);
          self.tableData = source;
-         [self reloadData];
+         if (self.isAutoReload)
+             [self reloadData];
      }];
 }
 
