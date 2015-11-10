@@ -50,4 +50,15 @@
     return [super respondsToSelector:aSelector];
 }
 
+- (BOOL)conformsToProtocol:(Protocol *)aProtocol
+{
+    if ([_middleMan conformsToProtocol:aProtocol]) {
+        return YES;
+    }
+    if ([_receiver conformsToProtocol:aProtocol]) {
+        return YES;
+    }
+    return [super conformsToProtocol:aProtocol];
+}
+
 @end
