@@ -204,7 +204,7 @@ typedef NS_OPTIONS(NSInteger, PINKBindCollectionView_DataSource_MethodType) {
         return [_dataSourceInterceptor.receiver collectionView:collectionView cellForItemAtIndexPath:indexPath];
     } else {
         UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:_cellReuseIdentifier forIndexPath:indexPath];
-        [(id<PINKBindCellProtocol>)cell bindCellViewModel:_collectionData[indexPath.section][indexPath.row]
+        [(id<PINKBindCellProtocol>)cell bindCellViewModel:_collectionData[indexPath.section][indexPath.item]
                                                 indexPath:indexPath
                                               displayFlag:YES];
         
@@ -220,7 +220,12 @@ typedef NS_OPTIONS(NSInteger, PINKBindCollectionView_DataSource_MethodType) {
     }
     
     if (_collectionData && _didSelectedCommand) {
-        [_didSelectedCommand execute:_collectionData[indexPath.section][indexPath.row]];
+        if (_collectionData.count > indexPath.section) {
+            NSArray *subArray = _collectionData[indexPath.section];
+            if (subArray.count > indexPath.item) {
+                [_didSelectedCommand execute:_collectionData[indexPath.section][indexPath.item]];
+            }
+        }
     }
     
     if ([_delegateInterceptor.receiver respondsToSelector:@selector(collectionView:didSelectItemAtIndexPath:)]) {

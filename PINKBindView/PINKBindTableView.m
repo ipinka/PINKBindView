@@ -222,7 +222,12 @@ typedef NS_OPTIONS(NSInteger, PINKBindTableView_Delegate_MethodType) {
     }
     
     if (_tableData && _didSelectedCommand) {
-        [_didSelectedCommand execute:_tableData[indexPath.section][indexPath.row]];
+        if (_tableData.count > indexPath.section) {
+            NSArray *subArray = _tableData[indexPath.section];
+            if (subArray.count > indexPath.row) {
+                [_didSelectedCommand execute:_tableData[indexPath.section][indexPath.row]];
+            }
+        }
     }
     
     if ([_delegateInterceptor.receiver respondsToSelector:@selector(tableView:didSelectRowAtIndexPath:)]) {
