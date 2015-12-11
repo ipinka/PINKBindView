@@ -48,6 +48,8 @@ typedef NS_OPTIONS(NSInteger, PINKBindTableView_Delegate_MethodType) {
     
     PINKBindTableView_DataSource_MethodType _dataSourceMethodType;
     PINKBindTableView_Delegate_MethodType _delegateMethodType;
+    
+    BOOL _deallocingFlag;
 }
 
 /**
@@ -94,6 +96,7 @@ typedef NS_OPTIONS(NSInteger, PINKBindTableView_Delegate_MethodType) {
 
 - (void)dealloc
 {
+    _deallocingFlag = YES;
     [[(NSObject *)_dataSourceInterceptor.receiver rac_deallocDisposable] removeDisposable:self.dataSourceDeallocDisposer];
     [[(NSObject *)_delegateInterceptor.receiver rac_deallocDisposable] removeDisposable:self.delegateDeallocDisposer];
 }
@@ -119,21 +122,25 @@ typedef NS_OPTIONS(NSInteger, PINKBindTableView_Delegate_MethodType) {
 #pragma mark - Overwrite DataSource
 - (void)setDataSource:(id<UITableViewDataSource>)dataSource
 {
-    [[(NSObject *)_dataSourceInterceptor.receiver rac_deallocDisposable] removeDisposable:self.dataSourceDeallocDisposer];
-    _dataSourceInterceptor.receiver = dataSource;
-    //UITableViewDataSource有类似缓存机制优化，所以先设置nil
-    [super setDataSource:nil];
-    [super setDataSource:(id<UITableViewDataSource>)_dataSourceInterceptor];
-    
-    [self updateDataSourceMethodType];
-    
-    if (dataSource) {
-        @weakify(self);
-        self.dataSourceDeallocDisposer = [RACDisposable disposableWithBlock:^{
-            @strongify(self);
-            self.dataSource = nil;
-        }];
-        [[(NSObject *)dataSource rac_deallocDisposable] addDisposable:self.dataSourceDeallocDisposer];
+    if (_deallocingFlag) {
+        [super setDataSource:dataSource];
+    } else {
+        [[(NSObject *)_dataSourceInterceptor.receiver rac_deallocDisposable] removeDisposable:self.dataSourceDeallocDisposer];
+        _dataSourceInterceptor.receiver = dataSource;
+        //UITableViewDataSource有类似缓存机制优化，所以先设置nil
+        [super setDataSource:nil];
+        [super setDataSource:(id<UITableViewDataSource>)_dataSourceInterceptor];
+        
+        [self updateDataSourceMethodType];
+        
+        if (dataSource) {
+            @weakify(self);
+            self.dataSourceDeallocDisposer = [RACDisposable disposableWithBlock:^{
+                @strongify(self);
+                self.dataSource = nil;
+            }];
+            [[(NSObject *)dataSource rac_deallocDisposable] addDisposable:self.dataSourceDeallocDisposer];
+        }
     }
 }
 
@@ -145,21 +152,25 @@ typedef NS_OPTIONS(NSInteger, PINKBindTableView_Delegate_MethodType) {
 #pragma mark - Overwrite Delegate
 - (void)setDelegate:(id<UITableViewDelegate>)delegate
 {
-    [[(NSObject *)_delegateInterceptor.receiver rac_deallocDisposable] removeDisposable:self.delegateDeallocDisposer];
-    _delegateInterceptor.receiver = delegate;
-    
-    [super setDelegate:nil];
-    [super setDelegate:(id<UITableViewDelegate>)_delegateInterceptor];
-    
-    [self updateDelegateMethodType];
-    
-    if (delegate) {
-        @weakify(self);
-        self.delegateDeallocDisposer = [RACDisposable disposableWithBlock:^{
-            @strongify(self);
-            self.delegate = nil;
-        }];
-        [[(NSObject *)delegate rac_deallocDisposable] addDisposable:self.delegateDeallocDisposer];
+    if (_deallocingFlag) {
+        [super setDelegate:delegate];
+    } else {
+        [[(NSObject *)_delegateInterceptor.receiver rac_deallocDisposable] removeDisposable:self.delegateDeallocDisposer];
+        _delegateInterceptor.receiver = delegate;
+        
+        [super setDelegate:nil];
+        [super setDelegate:(id<UITableViewDelegate>)_delegateInterceptor];
+        
+        [self updateDelegateMethodType];
+        
+        if (delegate) {
+            @weakify(self);
+            self.delegateDeallocDisposer = [RACDisposable disposableWithBlock:^{
+                @strongify(self);
+                self.delegate = nil;
+            }];
+            [[(NSObject *)delegate rac_deallocDisposable] addDisposable:self.delegateDeallocDisposer];
+        }
     }
 }
 
