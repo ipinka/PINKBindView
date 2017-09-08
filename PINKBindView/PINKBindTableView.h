@@ -25,7 +25,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "ReactiveObjC.h"
+#import <ReactiveObjC/ReactiveObjC.h>
 
 @protocol PINKBindCellProtocol;
 
