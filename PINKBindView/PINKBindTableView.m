@@ -38,7 +38,7 @@ typedef NS_OPTIONS(NSInteger, PINKBindTableView_DataSource_MethodType) {
 
 
 typedef NS_OPTIONS(NSInteger, PINKBindTableView_Delegate_MethodType) {
-     PINKBindTableView_Delegate_MethodType_heightForRowAtIndexPath  = 1 << 0,
+    PINKBindTableView_Delegate_MethodType_heightForRowAtIndexPath  = 1 << 0,
 };
 
 @interface PINKBindTableView ()<UITableViewDataSource, UITableViewDelegate>
@@ -195,9 +195,9 @@ typedef NS_OPTIONS(NSInteger, PINKBindTableView_Delegate_MethodType) {
     } else {
         UITableViewCell *cell = nil;
         if (_createCellBlock) {
-            cell = [tableView dequeueReusableCellWithIdentifier:_cellReuseIdentifier];
+            cell = _createCellBlock(indexPath, NO);
             if (!cell) {
-                cell = _createCellBlock(indexPath);
+                cell = [tableView dequeueReusableCellWithIdentifier:_cellReuseIdentifier];
             }
         } else {
             cell = [tableView dequeueReusableCellWithIdentifier:_cellReuseIdentifier];
@@ -333,7 +333,7 @@ typedef NS_OPTIONS(NSInteger, PINKBindTableView_Delegate_MethodType) {
         _cellReuseIdentifier = oneCell.reuseIdentifier;
         [self registerNib:_cellNib forCellReuseIdentifier:_cellReuseIdentifier];
     } else if (_createCellBlock) {
-        oneCell = _createCellBlock([NSIndexPath indexPathForRow:0 inSection:0]);
+        oneCell = _createCellBlock([NSIndexPath indexPathForRow:0 inSection:0], YES);
         _cellReuseIdentifier = oneCell.reuseIdentifier;
     }
     self.rowHeight = oneCell.frame.size.height;
@@ -366,7 +366,7 @@ typedef NS_OPTIONS(NSInteger, PINKBindTableView_Delegate_MethodType) {
         } else if (_cellNib) {
             _cacheCell = [_cellNib instantiateWithOwner:nil options:nil][0];
         } else if (_createCellBlock) {
-            _cacheCell = (UITableViewCell<PINKBindCellProtocol> *)_createCellBlock([NSIndexPath indexPathForRow:0 inSection:0]);
+            _cacheCell = (UITableViewCell<PINKBindCellProtocol> *)_createCellBlock([NSIndexPath indexPathForRow:0 inSection:0], YES);
         }
         [self reloadData];
     } else {

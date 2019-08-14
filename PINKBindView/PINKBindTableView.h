@@ -29,7 +29,7 @@
 
 @protocol PINKBindCellProtocol;
 
-typedef UITableViewCell *(^PINKBindTableViewCreateCellBlock)(NSIndexPath *indexPath);
+typedef UITableViewCell *(^PINKBindTableViewCreateCellBlock)(NSIndexPath *indexPath, BOOL isConfigCell);
 
 @interface PINKBindTableView : UITableView
 
