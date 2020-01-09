@@ -24,7 +24,7 @@
 //  THE SOFTWARE.
 //
 
-#import "RACEXTScope.h"
+#import <ReactiveCocoa/RACEXTScope.h>
 
 #import "PINKBindCollectionView.h"
 #import "PINKMessageInterceptor.h"
